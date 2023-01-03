@@ -7,6 +7,12 @@ if [ $1 = "-h" ] || [ $1 = "--help" ]; then
     echo "pod_name: The file name of your podspec"
     exit 0
 fi
+pod lib lint --allow-warnings
+
+if [ $? -ne 0 ]; then
+    echo "Lint failed"
+    exit 1
+fi
 
 # get versiom from podspec
 OLD_VERSION=`grep -m 1 -Eo "[0-9]+\.[0-9]+\.[0-9]+" $1.podspec`
