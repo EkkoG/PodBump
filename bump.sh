@@ -32,6 +32,7 @@ elif [ $2 = "major" ]; then
     sed -i '' "s/$OLD_VERSION/$VERSION/g" $1.podspec
 elif [ $2 = "init" ]; then
     echo "Init version, not change version"
+    VERSION=$OLD_VERSION
 fi
 
 if [ -f "Example/Podfile" ]; then
@@ -43,7 +44,6 @@ if ! git diff-index --quiet HEAD --; then
     echo "There are changes, commit them first"
     git add .
     git commit -m "Bump version to $VERSION"
-    exit 1
 fi
 
 git push origin main
