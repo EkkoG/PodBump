@@ -30,13 +30,22 @@ elif [ $2 = "major" ]; then
     VERSION=`echo $VERSION | awk -F. '{$2 = 0;} 1' | sed 's/ /./g'`
     VERSION=`echo $VERSION | awk -F. '{$NF = 0;} 1' | sed 's/ /./g'`
     sed -i '' "s/$OLD_VERSION/$VERSION/g" $1.podspec
+elif [ $2 = "init" ]; then
+    echo "Init version, not change version"
 fi
 
 if [ -f "Example/Podfile" ]; then
     pod install --project-directory=Example
 fi
-git add .
-git commit -m "Bump version to $VERSION"
+
+# Check if there are any changes
+if ! git diff-index --quiet HEAD --; then
+    echo "There are changes, commit them first"
+    git add .
+    git commit -m "Bump version to $VERSION"
+    exit 1
+fi
+
 git push origin main
 
 gh release create $VERSION --title $VERSION --notes "Release $VERSION" --target main --generate-notes
