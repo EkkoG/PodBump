@@ -46,8 +46,20 @@ if ! git diff-index --quiet HEAD --; then
     git commit -m "Bump version to $VERSION"
 fi
 
-git push origin main
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+git push origin $BRANCH
 
-gh release create $VERSION --title $VERSION --notes "Release $VERSION" --target main --generate-notes
+# Check if default repository is set for this directory
+# gh repo set-default
 
-pod trunk push $1.podspec --allow-warnings
+echo "Create release $VERSION"
+
+gh release create $VERSION --title $VERSION --notes "Release $VERSION" --target $BRANCH --generate-notes
+
+# Check if success
+if [ $? -eq 0 ]; then
+    echo "Release $VERSION success"
+    pod trunk push $1.podspec --allow-warnings
+else
+    echo "Release $VERSION failed"
+fi
