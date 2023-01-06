@@ -1,12 +1,13 @@
 
 #!/bin/bash -e
 
-if [ $1 = "-h" ] || [ $1 = "--help" ]; then
-    echo "Usage: bump.sh <pod_name> [major|minor|patch]"
+if [ -z $1 ] || [ $1 = "-h" ] || [ $1 = "--help" ]; then
+    echo "Usage: bump.sh <pod_name> [major|minor|patch|current]"
     echo "Example: bump.sh MyPod minor"
     echo "pod_name: The file name of your podspec"
-    exit 0
+    exit 1
 fi
+
 pod lib lint --allow-warnings
 
 if [ $? -ne 0 ]; then
@@ -36,7 +37,7 @@ elif [ $2 = "major" ]; then
     VERSION=`echo $VERSION | awk -F. '{$2 = 0;} 1' | sed 's/ /./g'`
     VERSION=`echo $VERSION | awk -F. '{$NF = 0;} 1' | sed 's/ /./g'`
     sed -i '' "s/$OLD_VERSION/$VERSION/g" $1.podspec
-elif [ $2 = "init" ]; then
+elif [ $2 = "current" ]; then
     echo "Init version, not change version"
     VERSION=$OLD_VERSION
 fi
